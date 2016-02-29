@@ -1,61 +1,57 @@
 // JQuery ready function
 $(document).ready(function() {
-    // Variables for X and Y co-ordinates
-    var x = 150;
-    var y = 150;
-    var speedX = 2;
-    var speedY = 4;
-    
-    // Getting the canavas element on the DOM
-    var id=document.getElementById("circle");
-    var canvas;
+    // Variables for X and Y speeds;
+    var speedX = 5;
+    var speedY = 5;
     
     // Variables for width and height of canvas element 
     var WIDTH; 
     var HEIGHT;
 
-    // Draw the circle 
-    function circle(x,y,r) {
-        canvas.beginPath();
-        canvas.arc(x, y, r, 0, Math.PI*2, true);
-        canvas.closePath();
-        canvas.fill();
-    }
+    // Initialization function
+    function init(canvasID, color, x, y, fps) {
 
-    // Draw the rectangle
-    function rect(x,y,w,h) {
-        canvas.beginPath();
-        canvas.rect(x,y,w,h);
-        canvas.closePath();
-        canvas.fill();
+        WIDTH = $("#"+ canvasID +"").width();
+        HEIGHT = $("#"+ canvasID +"").height();        
+        
+        //Create a stage by getting a reference to the canvas
+        stage = new createjs.Stage(canvasID);
+        //Create a Shape DisplayObject.
+        object = new createjs.Shape();
+        drawCircle(object, x, y, color);
+        //Add Shape instance to stage display list.
+        stage.addChild(object);  
+        
+        createjs.Ticker.on("tick", tick);
+        createjs.Ticker.setFPS(fps);
+        
     }
     
-    // Clear canvas for re-draw
-    function clear() {
-        canvas.clearRect(0, 0, WIDTH, HEIGHT);
+    
+    // Draw the circle 
+    function drawCircle(canvas, x, y, color) {
+        canvas.graphics.beginFill(color).drawCircle(x, y, 40);
     }
 
-    // Initialization function
-    function init() {
-        canvas = id.getContext("2d");
-        WIDTH = $("#circle").width()
-        HEIGHT = $("#circle").height()
-        return setInterval(draw, 10);
-    }
+    // Tick function
+    function tick(event) {
+        
+        if (object.x > WIDTH)
+            speedX =- 5;
+        else if (object.x < 0)
+            speedX =+ 5;
+        if (object.y > HEIGHT)
+            speedY =- 5;
+        else if (object.y < 0)
+            speedY =+ 5;
+        object.x += speedX;
+        object.y += speedY;
 
-    // Draw function
-    function draw() {
-        clear();
-        circle(x, y, 40);
-        if (x + speedX > WIDTH || x + speedX < 0)
-            speedX = -(2 + speedX);
-        if (y + speedY > HEIGHT || y + speedY < 0)
-            speedY = -(2 + speedY);
-        x += speedX;
-        y += speedY;
+        //Update stage will render next frame
+        stage.update(event);
     }
     
     // Invoking the initialization function.
-    init();
- 
+    init("circle", "red", 10, 10, 160 );
+
 });
